@@ -1,4 +1,4 @@
-# portfolio
+# Portfolio
 
 My personal developer portfolio. It's a fast, static website that introduces me, shows my education and skills, and lists my university and personal projects, pulled automatically from my GitHub repositories.
 
