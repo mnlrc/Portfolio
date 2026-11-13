@@ -1,0 +1,132 @@
+---
+import { categories, type ProjectCategory } from '../../config/site';
+import { getProjects } from '../../services/github/projects';
+import { languagesOf } from '../../services/github/repos';
+import Section from '../layout/Section.astro';
+import LanguageLabel from '../ui/LanguageLabel.astro';
+
+interface Props {
+  /** Two-digit section number shown in the label. */
+  index: string;
+}
+
+const { index } = Astro.props;
+
+const order: ProjectCategory[] = ['uni', 'personal'];
+const entries = await Promise.all(
+  order.map(async (key) => {
+    const result = await getProjects(key);
+    const repos = result.status === 'ok' ? [...result.featured, ...result.others] : [];
+    return {
+      ...categories[key],
+      count: result.status === 'ok' ? repos.length : null,
+      languages: languagesOf(repos).slice(0, 3),
+    };
+  }),
+);
+---
+
+<Section id="projects" index={index} label="Projects">
+  <ul role="list" class="entries">
+    {entries.map((entry) => (
+      <li class="entry">
+        <h3>
+          <a href={entry.path}>
+            {entry.title}
+            <span class="arrow" aria-hidden="true">
+              →
+            </span>
+          </a>
+        </h3>
+        <p class="description">{entry.description}</p>
+        <div class="meta">
+          {entry.count !== null && (
+            <span class="count mono">
+              {entry.count} {entry.count === 1 ? 'project' : 'projects'}
+            </span>
+          )}
+          {entry.languages.map(({ language }) => (
+            <LanguageLabel language={language} />
+          ))}
+        </div>
+      </li>
+    ))}
+  </ul>
+</Section>
+
+<style>
+  .entries {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  @media (min-width: 40rem) {
+    .entries {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .entry {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: var(--space-3);
+    padding: var(--space-6) var(--space-5);
+    background: var(--color-surface);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-md);
+    transition: border-color var(--duration-fast);
+  }
+
+  .entry:hover,
+  .entry:focus-within {
+    border-color: var(--color-accent);
+  }
+
+  h3 {
+    font-size: var(--text-xl);
+  }
+
+  h3 a {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-4);
+    text-decoration: none;
+  }
+
+  h3 a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  h3 a:focus-visible {
+    outline: none;
+  }
+
+  .arrow {
+    color: var(--color-accent);
+    transition: transform var(--duration-fast) var(--ease-out);
+  }
+
+  .entry:hover .arrow {
+    transform: translateX(4px);
+  }
+
+  .description {
+    color: var(--color-text-muted);
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2) var(--space-4);
+    padding-top: var(--space-2);
+    color: var(--color-text-muted);
+  }
+
+  .count {
+    font-size: var(--text-xs);
+  }
+</style>

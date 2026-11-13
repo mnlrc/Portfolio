@@ -1,0 +1,26 @@
+---
+import BaseLayout from '../components/layout/BaseLayout.astro';
+import Contact from '../components/sections/Contact.astro';
+import Education from '../components/sections/Education.astro';
+import Hero from '../components/sections/Hero.astro';
+import ProjectEntries from '../components/sections/ProjectEntries.astro';
+import Skills from '../components/sections/Skills.astro';
+import { site } from '../config/site';
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: site.name,
+  jobTitle: site.title,
+  url: Astro.site?.href,
+  sameAs: site.contact.links.map((link) => link.href),
+};
+---
+
+<BaseLayout jsonLd={jsonLd} snapScroll>
+  <Hero />
+  <ProjectEntries index="01" />
+  <Education index="02" />
+  <Skills index="03" />
+  <Contact index="04" />
+</BaseLayout>

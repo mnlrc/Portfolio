@@ -1,0 +1,34 @@
+---
+import BaseLayout from '../components/layout/BaseLayout.astro';
+import ButtonLink from '../components/ui/ButtonLink.astro';
+---
+
+<BaseLayout title="Page not found" description="This page does not exist." noindex>
+  <section class="container not-found" aria-labelledby="nf-heading">
+    <p class="code mono">404</p>
+    <h1 id="nf-heading">This page doesn't exist.</h1>
+    <p>It may have moved, or the link might be mistyped.</p>
+    <ButtonLink href="/">Back to home</ButtonLink>
+  </section>
+</BaseLayout>
+
+<style>
+  .not-found {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-4);
+    padding-block: var(--space-9);
+  }
+
+  .code {
+    color: var(--color-accent);
+  }
+
+  h1 {
+    font-size: var(--text-2xl);
+  }
+
+  p {
+    color: var(--color-text-muted);
+  }
+</style>

@@ -1,0 +1,80 @@
+---
+import { categories, site } from '../../config/site';
+import ButtonLink from '../ui/ButtonLink.astro';
+import ProfilePhoto from '../ui/ProfilePhoto.astro';
+import CurrentProject from './CurrentProject.astro';
+---
+
+<section class="hero container snap-section" aria-labelledby="hero-heading">
+  <div class="text">
+    <p class="role mono">{site.title}</p>
+    <h1 id="hero-heading">{site.name}</h1>
+    <p class="intro">{site.intro}</p>
+    <div class="actions">
+      <ButtonLink href={categories.uni.path}>University projects</ButtonLink>
+      <ButtonLink href={categories.personal.path} variant="secondary">
+        Personal projects
+      </ButtonLink>
+    </div>
+    <CurrentProject />
+  </div>
+  <div class="portrait">
+    <ProfilePhoto />
+  </div>
+</section>
+
+<style>
+  .hero {
+    display: grid;
+    align-content: center;
+    gap: var(--space-7);
+    padding-block: var(--space-8);
+  }
+
+  .text {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  .role {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+
+  h1 {
+    font-size: var(--text-display);
+    font-weight: 600;
+    overflow-wrap: anywhere;
+  }
+
+  .intro {
+    max-width: var(--prose-max);
+    font-size: var(--text-lg);
+    color: var(--color-text-muted);
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
+  /* Mobile: photo first and small; desktop: photo to the right. */
+  .portrait {
+    order: -1;
+    width: min(9rem, 40vw);
+  }
+
+  @media (min-width: 64rem) {
+    .hero {
+      grid-template-columns: 1fr 22rem;
+      align-items: center;
+      gap: var(--space-9);
+    }
+
+    .portrait {
+      order: 0;
+      width: 100%;
+    }
+  }
+</style>

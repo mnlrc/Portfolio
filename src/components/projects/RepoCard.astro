@@ -1,0 +1,178 @@
+---
+import type { Repo } from '../../services/github/githubTypes';
+import { formatDate } from '../../utils/formatDate';
+import LanguageLabel from '../ui/LanguageLabel.astro';
+
+interface Props {
+  repo: Repo;
+  featured?: boolean;
+  headingLevel?: 'h2' | 'h3';
+}
+
+const { repo, featured = false, headingLevel: Heading = 'h3' } = Astro.props;
+const topics = repo.topics.slice(0, featured ? 6 : 4);
+---
+
+<li class:list={['card', { featured }]} data-language={repo.language ?? 'Other'}>
+  <article>
+    {featured && <p class="eyebrow mono">Featured</p>}
+    <Heading class="name">
+      <a href={repo.url} rel="noopener" target="_blank">
+        {repo.name}
+        <span class="visually-hidden"> (opens GitHub in a new tab)</span>
+      </a>
+    </Heading>
+    <p class:list={['description', { missing: !repo.description }]}>
+      {repo.description ?? 'No description provided.'}
+    </p>
+
+    {topics.length > 0 && (
+      <ul role="list" class="topics" aria-label="Topics">
+        {topics.map((topic) => (
+          <li class="mono">{topic}</li>
+        ))}
+      </ul>
+    )}
+
+    <dl class="meta">
+      {repo.language && (
+        <div>
+          <dt class="visually-hidden">Language</dt>
+          <dd>
+            <LanguageLabel language={repo.language} />
+          </dd>
+        </div>
+      )}
+      <div>
+        <dt class="visually-hidden">Stars</dt>
+        <dd class="mono">
+          <span aria-hidden="true">★ </span>
+          {repo.stars}
+        </dd>
+      </div>
+      <div>
+        <dt class="visually-hidden">Forks</dt>
+        <dd class="mono">
+          <span aria-hidden="true">⑂ </span>
+          {repo.forks}
+        </dd>
+      </div>
+      <div class="updated">
+        <dt class="visually-hidden">Last updated</dt>
+        <dd class="mono">
+          <time datetime={repo.updatedAt}>{formatDate(repo.updatedAt)}</time>
+        </dd>
+      </div>
+    </dl>
+  </article>
+</li>
+
+<style>
+  .card {
+    position: relative;
+    display: flex;
+    background: var(--color-surface);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-md);
+    transition:
+      border-color var(--duration-fast),
+      transform var(--duration-fast) var(--ease-out);
+  }
+
+  .card:hover {
+    border-color: var(--color-border-strong);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .card:hover {
+      transform: translateY(-2px);
+    }
+  }
+
+  .card:focus-within {
+    border-color: var(--color-accent);
+  }
+
+  article {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    width: 100%;
+    padding: var(--space-5);
+  }
+
+  .eyebrow {
+    font-size: var(--text-xs);
+    color: var(--color-accent);
+    text-transform: uppercase;
+  }
+
+  .name {
+    font-size: var(--text-lg);
+    letter-spacing: -0.01em;
+    overflow-wrap: anywhere;
+  }
+
+  .featured .name {
+    font-size: var(--text-xl);
+  }
+
+  .name a {
+    text-decoration: none;
+  }
+
+  /* Whole card is clickable via the heading link. */
+  .name a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-md);
+  }
+
+  .name a:focus-visible {
+    outline: none;
+  }
+
+  .description {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .description.missing {
+    font-style: italic;
+  }
+
+  .topics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .topics li {
+    padding: 0 var(--space-2);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-sm);
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2) var(--space-4);
+    margin-top: auto;
+    padding-top: var(--space-3);
+    border-top: var(--border-width) solid var(--color-border);
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+  }
+
+  .meta dd {
+    margin: 0;
+  }
+
+  .updated {
+    margin-left: auto;
+  }
+</style>

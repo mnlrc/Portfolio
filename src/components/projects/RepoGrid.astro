@@ -1,0 +1,140 @@
+---
+import type { Repo } from '../../services/github/githubTypes';
+import { languagesOf } from '../../services/github/repos';
+import RepoCard from './RepoCard.astro';
+
+interface Props {
+  featured: Repo[];
+  others: Repo[];
+}
+
+const { featured, others } = Astro.props;
+const all = [...featured, ...others];
+const languages = languagesOf(all);
+const hasOther = all.some((r) => !r.language);
+const filterable = languages.length + (hasOther ? 1 : 0) > 1;
+---
+
+<div class="grid-root" data-repo-filter>
+  {filterable && (
+    <div class="filters" data-filter-controls hidden>
+      <p id="filter-label" class="filter-label mono">
+        Filter by language
+      </p>
+      <ul role="list" class="chips" aria-labelledby="filter-label">
+        <li>
+          <button type="button" class="chip" data-filter-value="all" aria-pressed="true">
+            All <span class="count">{all.length}</span>
+          </button>
+        </li>
+        {languages.map(({ language, count }) => (
+          <li>
+            <button type="button" class="chip" data-filter-value={language} aria-pressed="false">
+              {language} <span class="count">{count}</span>
+            </button>
+          </li>
+        ))}
+        {hasOther && (
+          <li>
+            <button type="button" class="chip" data-filter-value="Other" aria-pressed="false">
+              Other
+            </button>
+          </li>
+        )}
+      </ul>
+      <p class="visually-hidden" role="status" data-filter-status />
+    </div>
+  )}
+
+  <ul role="list" class="grid">
+    {featured.map((repo) => (
+      <RepoCard repo={repo} featured />
+    ))}
+    {others.map((repo) => (
+      <RepoCard repo={repo} />
+    ))}
+  </ul>
+
+  <p class="no-match" data-filter-empty hidden>
+    No projects match this language.
+  </p>
+</div>
+
+<style>
+  .grid-root {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  .filters {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .filters[hidden] {
+    display: none;
+  }
+
+  .filter-label {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+  }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .chip {
+    min-height: 2.25rem;
+    padding: var(--space-1) var(--space-4);
+    background: none;
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-full);
+    font-size: var(--text-sm);
+    cursor: pointer;
+    transition:
+      border-color var(--duration-fast),
+      background-color var(--duration-fast);
+  }
+
+  .chip:hover {
+    border-color: var(--color-border-strong);
+  }
+
+  .chip[aria-pressed='true'] {
+    background: var(--color-text);
+    border-color: var(--color-text);
+    color: var(--color-bg);
+  }
+
+  .count {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    opacity: 0.7;
+  }
+
+  .grid {
+    display: grid;
+    gap: var(--space-4);
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
+  }
+
+  .grid > :global(.featured) {
+    grid-column: 1 / -1;
+  }
+
+  .grid > :global([hidden]) {
+    display: none;
+  }
+
+  .no-match {
+    color: var(--color-text-muted);
+  }
+</style>
+
+<script>
+  import '../../scripts/repoFilter';
+</script>

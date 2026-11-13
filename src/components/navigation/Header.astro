@@ -1,0 +1,83 @@
+---
+import { categories, site } from '../../config/site';
+import ThemeToggle from '../ui/ThemeToggle.astro';
+
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+const nav = [
+  { label: 'Uni', href: categories.uni.path },
+  { label: 'Personal', href: categories.personal.path },
+  { label: 'Contact', href: '/#contact' },
+];
+---
+
+<header class="header">
+  <div class="container inner">
+    <a class="brand mono" href="/" aria-label={`${site.name}, home`}>
+      {site.name}
+    </a>
+    <nav aria-label="Main">
+      <ul role="list" class="nav">
+        {nav.map((item) => (
+          <li>
+            <a href={item.href} aria-current={path === item.href ? 'page' : undefined}>
+              {item.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+    <ThemeToggle />
+  </div>
+</header>
+
+<style>
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: var(--color-bg);
+    border-bottom: var(--border-width) solid var(--color-border);
+  }
+
+  .inner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    height: var(--header-height);
+  }
+
+  .brand {
+    font-weight: 600;
+    text-decoration: none;
+    margin-right: auto;
+  }
+
+  .nav {
+    display: flex;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+  }
+
+  .nav a {
+    display: block;
+    padding: var(--space-2) var(--space-2);
+    text-decoration: none;
+    color: var(--color-text-muted);
+  }
+
+  .nav a:hover,
+  .nav a[aria-current='page'] {
+    color: var(--color-text);
+  }
+
+  .nav a[aria-current='page'] {
+    text-decoration: underline;
+    text-decoration-color: var(--color-accent);
+  }
+
+  @media (min-width: 40rem) {
+    .nav {
+      gap: var(--space-4);
+    }
+  }
+</style>

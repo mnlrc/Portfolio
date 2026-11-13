@@ -1,0 +1,90 @@
+---
+import { site } from '../../config/site';
+import { getCurrentProject } from '../../services/github/projects';
+import { formatDate } from '../../utils/formatDate';
+import LanguageLabel from '../ui/LanguageLabel.astro';
+
+const repo = await getCurrentProject();
+const note = site.currentProject.note.trim();
+---
+
+<aside class="current" aria-labelledby="current-heading">
+  <p id="current-heading" class="label mono">
+    <span class="pulse" aria-hidden="true"></span>
+    Currently working on
+  </p>
+  {repo ? (
+    <>
+      <h2 class="name">
+        <a href={repo.url} rel="noopener" target="_blank">
+          {repo.name}
+          <span class="visually-hidden"> (opens GitHub in a new tab)</span>
+          <span aria-hidden="true"> ↗</span>
+        </a>
+      </h2>
+      {(note || repo.description) && <p class="text">{note || repo.description}</p>}
+      <p class="meta mono">
+        {repo.language && <LanguageLabel language={repo.language} />}
+        <span>
+          Last push <time datetime={repo.updatedAt}>{formatDate(repo.updatedAt)}</time>
+        </span>
+      </p>
+    </>
+  ) : (
+    <p class="text">
+      Project details are unavailable right now —{' '}
+      <a href={`https://github.com/${site.github.username}`} rel="noopener" target="_blank">
+        see GitHub
+      </a>
+      .
+    </p>
+  )}
+</aside>
+
+<style>
+  .current {
+    display: grid;
+    gap: var(--space-3);
+    padding-top: var(--space-5);
+    border-top: var(--border-width) solid var(--color-border);
+  }
+
+  .label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+  }
+
+  .pulse {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: var(--radius-full);
+    background: var(--color-accent);
+  }
+
+  .name {
+    font-size: var(--text-xl);
+    overflow-wrap: anywhere;
+  }
+
+  .name a {
+    text-decoration: none;
+  }
+
+  .text {
+    color: var(--color-text-muted);
+    max-width: var(--prose-max);
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2) var(--space-5);
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+  }
+</style>

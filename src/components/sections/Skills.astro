@@ -1,0 +1,58 @@
+---
+import { site } from '../../config/site';
+import Section from '../layout/Section.astro';
+
+interface Props {
+  /** Two-digit section number shown in the label. */
+  index: string;
+}
+
+const { index } = Astro.props;
+---
+
+<Section id="skills" index={index} label="Skills">
+  <dl class="groups">
+    {site.skills.map((group) => (
+      <div class="group">
+        <dt class="mono">{group.label}</dt>
+        <dd>
+          <ul role="list" class="items">
+            {group.items.map((item) => (
+              <li>{item}</li>
+            ))}
+          </ul>
+        </dd>
+      </div>
+    ))}
+  </dl>
+</Section>
+
+<style>
+  .groups {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  @media (min-width: 40rem) {
+    .groups {
+      grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+    }
+  }
+
+  dt {
+    margin-bottom: var(--space-2);
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+  }
+
+  dd {
+    margin: 0;
+  }
+
+  .items {
+    display: grid;
+    gap: var(--space-1);
+    font-size: var(--text-lg);
+  }
+</style>

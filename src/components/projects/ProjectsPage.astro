@@ -1,0 +1,130 @@
+---
+import { categories, site, type ProjectCategory } from '../../config/site';
+import { getProjects } from '../../services/github/projects';
+import BaseLayout from '../layout/BaseLayout.astro';
+import ButtonLink from '../ui/ButtonLink.astro';
+import RepoGrid from './RepoGrid.astro';
+
+interface Props {
+  category: ProjectCategory;
+}
+
+const { category } = Astro.props;
+const meta = categories[category];
+const other = categories[category === 'uni' ? 'personal' : 'uni'];
+const result = await getProjects(category);
+const total = result.status === 'ok' ? result.featured.length + result.others.length : 0;
+const profileUrl = `https://github.com/${site.github.username}`;
+---
+
+<BaseLayout title={meta.title} description={meta.description}>
+  <div class="container page">
+    <header class="intro">
+      <p class="crumbs mono">
+        <a href="/">Home</a> <span aria-hidden="true">/</span> Projects
+      </p>
+      <h1>{meta.title}</h1>
+      <p class="lead">{meta.description}</p>
+      {result.status === 'ok' && total > 0 && (
+        <p class="summary mono">
+          {total} {total === 1 ? 'repository' : 'repositories'} · from{' '}
+          <a href={profileUrl} rel="noopener" target="_blank">
+            github.com/{site.github.username}
+          </a>
+        </p>
+      )}
+    </header>
+
+    {result.status === 'error' ? (
+      <div class="notice" role="status">
+        <h2>Projects are temporarily unavailable</h2>
+        <p>
+          GitHub couldn't be reached while this page was built. In the meantime, browse everything
+          directly on GitHub.
+        </p>
+        <ButtonLink href={profileUrl} variant="secondary" rel="noopener" target="_blank">
+          View profile on GitHub
+        </ButtonLink>
+      </div>
+    ) : total === 0 ? (
+      <div class="notice">
+        <h2>Nothing here yet</h2>
+        <p>
+          No {category === 'uni' ? 'university' : 'personal'} projects are published at the moment.
+        </p>
+        <ButtonLink href={other.path} variant="secondary">
+          See {other.title.toLowerCase()}
+        </ButtonLink>
+      </div>
+    ) : (
+      <>
+        {result.stale && (
+          <p class="stale mono" role="status">
+            Showing cached data — GitHub was unreachable during the last refresh.
+          </p>
+        )}
+        <RepoGrid featured={result.featured} others={result.others} />
+      </>
+    )}
+
+    <nav class="next" aria-label="Other projects">
+      <a href={other.path}>
+        {other.title} <span aria-hidden="true">→</span>
+      </a>
+    </nav>
+  </div>
+</BaseLayout>
+
+<style>
+  .page {
+    display: grid;
+    gap: var(--space-7);
+    padding-top: var(--space-8);
+  }
+
+  .intro {
+    display: grid;
+    gap: var(--space-4);
+    max-width: var(--prose-max);
+  }
+
+  .crumbs,
+  .summary,
+  .stale {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+  }
+
+  h1 {
+    font-size: var(--text-2xl);
+  }
+
+  .lead {
+    font-size: var(--text-lg);
+    color: var(--color-text-muted);
+  }
+
+  .notice {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-3);
+    padding: var(--space-6);
+    border: var(--border-width) dashed var(--color-border-strong);
+    border-radius: var(--radius-md);
+  }
+
+  .notice h2 {
+    font-size: var(--text-lg);
+  }
+
+  .notice p {
+    color: var(--color-text-muted);
+    max-width: var(--prose-max);
+  }
+
+  .next {
+    padding-top: var(--space-5);
+    border-top: var(--border-width) solid var(--color-border);
+    font-size: var(--text-lg);
+  }
+</style>

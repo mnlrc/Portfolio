@@ -1,0 +1,60 @@
+---
+import { site } from '../../config/site';
+import Section from '../layout/Section.astro';
+
+interface Props {
+  /** Two-digit section number shown in the label. */
+  index: string;
+}
+
+const { index } = Astro.props;
+
+const { email, links } = site.contact;
+---
+
+<Section id="contact" index={index} label="Contact">
+  <div class="contact">
+    <p class="lead">Interested in my work, or want to collaborate? Get in touch.</p>
+    {email && (
+      <a class="email" href={`mailto:${email}`}>
+        {email}
+      </a>
+    )}
+    <ul role="list" class="links">
+      {links.map((link) => (
+        <li>
+          <a href={link.href} rel="me noopener" target="_blank">
+            {link.label} <span aria-hidden="true">↗</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</Section>
+
+<style>
+  .contact {
+    display: grid;
+    gap: var(--space-4);
+    justify-items: start;
+  }
+
+  .lead {
+    font-size: var(--text-xl);
+    max-width: var(--prose-max);
+  }
+
+  .email {
+    font-size: var(--text-xl);
+    text-decoration-color: var(--color-accent);
+    overflow-wrap: anywhere;
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-5);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+  }
+</style>

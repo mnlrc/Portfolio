@@ -1,0 +1,30 @@
+name: CI
+
+# Checks that the project lints, type-checks, passes tests and builds.
+# It does not deploy anything; deployment is deferred until a domain/hosting is chosen.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run check
+      - run: npm test
+      - run: npm run build
+        env:
+          # Build-time only: used server-side to fetch public repos; never shipped to the browser.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

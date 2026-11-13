@@ -1,0 +1,45 @@
+---
+interface Props {
+  id: string;
+  /** Two-digit index shown in the section label, e.g. "01". */
+  index: string;
+  label: string;
+}
+
+const { id, index, label } = Astro.props;
+const headingId = `${id}-heading`;
+---
+
+<section id={id} class="section container snap-section" aria-labelledby={headingId} data-reveal>
+  <h2 id={headingId} class="label mono">
+    <span aria-hidden="true">{index} —</span>
+    {label}
+  </h2>
+  <div class="body">
+    <slot />
+  </div>
+</section>
+
+<style>
+  .section {
+    display: grid;
+    gap: var(--space-5);
+    padding-block: var(--space-8);
+    border-top: var(--border-width) solid var(--color-border);
+  }
+
+  .label {
+    font-size: var(--text-sm);
+    font-weight: 500;
+    letter-spacing: var(--tracking-mono);
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+  }
+
+  @media (min-width: 48rem) {
+    .section {
+      grid-template-columns: 12rem 1fr;
+      gap: var(--space-6);
+    }
+  }
+</style>

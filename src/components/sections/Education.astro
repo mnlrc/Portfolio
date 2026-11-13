@@ -1,0 +1,95 @@
+---
+import { site } from '../../config/site';
+import Section from '../layout/Section.astro';
+
+interface Props {
+  index: string;
+}
+
+const { index } = Astro.props;
+const degrees = site.education.filter((d) => d.degree.trim());
+const statusLabel = { completed: 'Completed', 'in-progress': 'In progress', planned: 'Planned' };
+const period = (start: string, end: string, status: string) =>
+  [start, end || (status === 'in-progress' ? 'present' : '')].filter(Boolean).join(' – ');
+---
+
+<Section id="education" index={index} label="Education">
+  <ol role="list" class="timeline">
+    {degrees.map((d) => (
+      <li class="entry">
+        <p class="when mono">
+          {period(d.start, d.end, d.status) || '—'}
+          <span class="status">{statusLabel[d.status]}</span>
+        </p>
+        <div class="what">
+          <h3>{d.degree}</h3>
+          <p class="institution">{d.institution}</p>
+          {d.details.length > 0 && (
+            <ul role="list" class="details">
+              {d.details.map((line) => (
+                <li>{line}</li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </li>
+    ))}
+  </ol>
+</Section>
+
+<style>
+  .timeline {
+    display: grid;
+    gap: var(--space-6);
+    padding: 0;
+    list-style: none;
+  }
+
+  .entry {
+    display: grid;
+    gap: var(--space-2);
+    padding-left: var(--space-5);
+    border-left: var(--border-width) solid var(--color-border-strong);
+  }
+
+  @media (min-width: 40rem) {
+    .entry {
+      grid-template-columns: 11rem 1fr;
+      gap: var(--space-5);
+    }
+  }
+
+  .when {
+    display: grid;
+    align-content: start;
+    gap: var(--space-1);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+
+  .status {
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+  }
+
+  .what {
+    display: grid;
+    gap: var(--space-1);
+  }
+
+  h3 {
+    font-size: var(--text-xl);
+  }
+
+  .institution,
+  .details {
+    color: var(--color-text-muted);
+  }
+
+  .details {
+    display: grid;
+    gap: var(--space-1);
+    padding-top: var(--space-2);
+    font-size: var(--text-sm);
+  }
+</style>
